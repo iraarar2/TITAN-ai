@@ -16,4 +16,48 @@ $('add').onclick=()=>{if(selected&&!watch.some(p=>p.baseToken.address===selected
 $('gate').onclick=()=>{let n=[...document.querySelectorAll('.gate')].filter(x=>x.checked).length;$('gateout').textContent=n===5?'CHECKLIST COMPLETE — tetap bukan jaminan aman. Pastikan semua pemeriksaan benar-benar didukung bukti.':'ENTRY BLOCKED — '+n+'/5 pemeriksaan ditandai selesai.';$('gateout').className='status '+(n===5?'yellow':'red')};
 function structure(a){if(!Array.isArray(a)||a.length<8)throw Error('Minimal 8 candle.');for(let c of a)for(let k of ['open','high','low','close'])if(!Number.isFinite(+c[k]))throw Error('OHLC harus numerik');let n=a.length,last=a[n-1],look=Math.min(5,Math.max(2,Math.floor(n/4))),prev=a.slice(n-look-1,n-1),ph=Math.max(...prev.map(x=>+x.high)),pl=Math.min(...prev.map(x=>+x.low)),range=+last.high-(+last.low),body=Math.abs(+last.close-(+last.open)),avg=a.slice(Math.max(0,n-6),n-1).reduce((s,c)=>s+(+c.high-(+c.low)),0)/Math.min(5,n-1),disp=range>avg*1.5&&range>0&&body/range>=.65,bull=+last.close>ph&&+last.close>+last.open,bear=+last.close<pl&&+last.close<+last.open;let f='Tidak terdeteksi';if(+a[n-1].low>+a[n-3].high)f=`Bullish FVG ${a[n-3].high}–${a[n-1].low}`;else if(+a[n-1].high<+a[n-3].low)f=`Bearish FVG ${a[n-1].high}–${a[n-3].low}`;return{bias:bull?'Bullish swing-break proxy':bear?'Bearish swing-break proxy':'Belum ada MSS proxy',disp,f,ph,pl}}
 $('analyze').onclick=()=>{try{let x=structure(JSON.parse($('ohlc').value));$('out').innerHTML=`<b>${$('tf').value} · ${x.bias}</b><br>Displacement: ${x.disp?'Ya':'Tidak'}<br>Previous swing high proxy: ${x.ph}<br>Previous swing low proxy: ${x.pl}<br>FVG: ${x.f}<br><br><span class="yellow">Edukasi/prototipe. Bukan definisi ICT tervalidasi atau rekomendasi entry.</span>`}catch(e){$('out').textContent='Data salah: '+e.message}};$('sample').onclick=()=>$('ohlc').value=JSON.stringify([{open:10,high:10.5,low:9.8,close:10.2},{open:10.2,high:10.4,low:9.9,close:10.1},{open:10.1,high:10.3,low:9.7,close:10},{open:10,high:10.2,low:9.6,close:9.8},{open:9.8,high:10,low:9.5,close:9.7},{open:9.7,high:10.1,low:9.6,close:10},{open:10,high:10.8,low:9.95,close:10.7},{open:10.7,high:11.2,low:10.6,close:11.1}],null,2);
-</script></body></html>
+</script>
+<section class="card" id="titan-command" style="margin-top:12px">
+  <h2>🤖 TITAN AI Command Center</h2>
+  <p class="muted">
+    Berikan perintah untuk analisis pasar Solana.
+  </p>
+
+  <label for="titan-prompt">Masukkan perintah</label>
+  <textarea
+    id="titan-prompt"
+    placeholder="Contoh: TITAN, scan token Solana dan cari peluang breakout..."
+    style="min-height:90px"
+  ></textarea>
+
+  <button id="titan-send" style="margin-top:8px">
+    Kirim Perintah
+  </button>
+
+  <div id="titan-response" class="status" style="margin-top:10px">
+    TITAN siap menerima perintah.
+  </div>
+</section>
+
+<script>
+(() => {
+  const promptBox = document.getElementById("titan-prompt");
+  const sendButton = document.getElementById("titan-send");
+  const responseBox = document.getElementById("titan-response");
+
+  sendButton.addEventListener("click", () => {
+    const command = promptBox.value.trim();
+
+    if (!command) {
+      responseBox.textContent = "Masukkan perintah terlebih dahulu.";
+      return;
+    }
+
+    responseBox.textContent =
+      "Perintah diterima: " + command +
+      "\n\nStatus: Menunggu integrasi AI backend." +
+      "\n\nMesin AI belum terhubung. Belum ada analisis atau transaksi yang dijalankan.";
+  });
+})();
+</script>
+</body></html>
